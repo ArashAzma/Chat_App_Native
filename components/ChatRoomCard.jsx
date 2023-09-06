@@ -30,7 +30,9 @@ const ChatRoomCard = ({ room }) => {
                     }}
                     resizeMode='contain'
                 />
-                <Text style={tw`text-4 text-xl`}>{room.ChatName}</Text>
+                <Text style={tw`text-4 text-xl w-50`} numberOfLines={1}>
+                    {room.ChatName}
+                </Text>
             </View>
         </TouchableOpacity>
     );

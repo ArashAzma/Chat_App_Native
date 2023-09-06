@@ -1,11 +1,13 @@
 import { View, TouchableWithoutFeedback } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import tw from "twrnc";
 import { Feather } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
+import { userContext } from "../context/UserProvider";
 const Footer = () => {
+    const { user } = useContext(userContext);
     const navigation = useNavigation();
     const routeName = useNavigationState((state) => {
         const arr = state?.routes;
@@ -22,9 +24,10 @@ const Footer = () => {
             style={tw`${
                 routeName == "Login" ||
                 routeName == "Signup" ||
-                routeName === "ChatCreation"
+                routeName === "ChatCreation" ||
+                routeName === "Chat"
                     ? "hidden "
-                    : " visible "
+                    : ""
             } h-20 w-full flex-row justify-evenly items-center`}
         >
             <TouchableWithoutFeedback
@@ -52,7 +55,7 @@ const Footer = () => {
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback
                 onPress={() => {
-                    navigation.navigate("Account");
+                    navigation.navigate("Account", { USER: user });
                     handleTab("account");
                 }}
             >

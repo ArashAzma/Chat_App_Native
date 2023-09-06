@@ -5,6 +5,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     KeyboardAvoidingView,
+    TouchableWithoutFeedback,
 } from "react-native";
 import React, { useContext, useState } from "react";
 import tw from "twrnc";
@@ -16,12 +17,15 @@ import { fireAuth, fireDb } from "../config/firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { userContext } from "../context/UserProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+
 const LoginScreen = () => {
     const { setCurrentUser } = useContext(userContext);
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPass, setShowPass] = useState(false);
     const navigation = useNavigation();
     const handleLogin = async () => {
         try {
@@ -41,6 +45,9 @@ const LoginScreen = () => {
                     if (docSnap.exists()) {
                         setCurrentUser(docSnap.data());
                         console.log("DATA", docSnap.data());
+                        setEmail("");
+                        setPass("");
+                        setError("");
                         navigation.navigate("Home");
                     }
                 }
@@ -85,12 +92,37 @@ const LoginScreen = () => {
                                     setState={setEmail}
                                     placeholder='email'
                                 />
-                                <UserInput
-                                    value={pass}
-                                    setState={setPass}
-                                    placeholder='password'
-                                    isPass
-                                />
+                                <View style={tw`w-full`}>
+                                    <UserInput
+                                        value={pass}
+                                        setState={setPass}
+                                        placeholder='password'
+                                        isPass={!showPass}
+                                    />
+                                    {showPass ? (
+                                        <TouchableWithoutFeedback
+                                            onPress={() => setShowPass(false)}
+                                        >
+                                            <Ionicons
+                                                name='ios-eye-outline'
+                                                size={24}
+                                                color='black'
+                                                style={tw`absolute top-4 right-0`}
+                                            />
+                                        </TouchableWithoutFeedback>
+                                    ) : (
+                                        <TouchableWithoutFeedback
+                                            onPress={() => setShowPass(true)}
+                                        >
+                                            <Ionicons
+                                                name='ios-eye-off-outline'
+                                                size={24}
+                                                color='black'
+                                                style={tw`absolute top-4 right-0`}
+                                            />
+                                        </TouchableWithoutFeedback>
+                                    )}
+                                </View>
                                 {error && (
                                     <Text
                                         style={tw`text-red-700 font-semibold w-full`}

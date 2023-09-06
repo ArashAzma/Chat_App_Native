@@ -1,14 +1,15 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableWithoutFeedback } from "react-native";
 import React from "react";
 import tw from "twrnc";
+import { useNavigation } from "@react-navigation/native";
 const MessageCard = ({ message, isUser }) => {
+    const navigation = useNavigation();
     const {
         message: text,
         user: { photoURL },
         timeStamp,
     } = message;
     const date = new Date(timeStamp?.toDate());
-
     const hours = date.getHours();
     const minutes = date.getMinutes();
 
@@ -16,17 +17,25 @@ const MessageCard = ({ message, isUser }) => {
         <View style={tw`w-full ${isUser ? "items-end" : "items-start"} p-2 `}>
             <View style={tw`flex-row p-2`}>
                 {!isUser && (
-                    <Image
-                        source={
-                            photoURL
-                                ? { uri: photoURL }
-                                : require("../assets/icon.png")
+                    <TouchableWithoutFeedback
+                        onPress={() =>
+                            navigation.navigate("Account", {
+                                USER: message.user,
+                            })
                         }
-                        style={{
-                            ...tw`rounded-full w-13 h-[13] mr-1`,
-                        }}
-                        resizeMode='contain'
-                    />
+                    >
+                        <Image
+                            source={
+                                photoURL
+                                    ? { uri: photoURL }
+                                    : require("../assets/icon.png")
+                            }
+                            style={{
+                                ...tw`rounded-full w-13 h-[13] mr-1`,
+                            }}
+                            resizeMode='contain'
+                        />
+                    </TouchableWithoutFeedback>
                 )}
                 <View
                     style={tw`${

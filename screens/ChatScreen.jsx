@@ -6,8 +6,10 @@ import {
     Dimensions,
     FlatList,
     KeyboardAvoidingView,
+    Keyboard,
 } from "react-native";
 import React, { useContext, useLayoutEffect, useState } from "react";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import MessageCard from "../components/MessageCard";
@@ -69,14 +71,12 @@ const ChatScreen = () => {
     return (
         <View
             style={{
-                ...tw`h-full items-center `,
+                ...tw`h-full items-center bg-[#DDE6ED] bg-opacity-25`,
                 width: width,
             }}
         >
-            <SafeAreaView
-                style={tw` w-full bg-[#DDE6ED] items-center bg-opacity-25`}
-            >
-                <KeyboardAvoidingView style={tw` w-full  items-center`}>
+            <SafeAreaView style={tw`w-full items-center mt-2`}>
+                <KeyboardAvoidingView style={tw`w-full items-center`}>
                     <View
                         style={tw`h-[15%] items-center justify-center w-full`}
                     >
@@ -90,21 +90,27 @@ const ChatScreen = () => {
                                 color='black'
                             />
                         </TouchableOpacity>
-                        <Text style={tw` text-4xl`}>{room?.ChatName}</Text>
+                        <Text
+                            style={tw` text-4xl w-60 text-center`}
+                            numberOfLines={2}
+                        >
+                            {room?.ChatName}
+                        </Text>
                     </View>
                     <View
-                        style={tw`w-full h-[77%] py-12 bg-[#FDFEFE] px-3 rounded-t-15 justify-between`}
+                        style={tw`w-full h-[77%] py-12 bg-[#FDFEFE] px-3 rounded-t-15`}
                     >
-                        <FlatList
-                            data={messages}
+                        <KeyboardAwareFlatList
+                            inverted
+                            data={messages && [...messages].reverse()}
                             showsVerticalScrollIndicator={false}
                             ref={(ref) => (this.flatList = ref)}
-                            onContentSizeChange={() =>
-                                this.flatList.scrollToEnd({ animated: true })
-                            }
-                            onLayout={() =>
-                                this.flatList.scrollToEnd({ animated: true })
-                            }
+                            // onContentSizeChange={() =>
+                            //     this.flatList.scrollToEnd({ animated: true })
+                            // }
+                            // onLayout={() =>
+                            //     this.flatList.scrollToEnd({ animated: true })
+                            // }
                             renderItem={(item) => {
                                 const msg = item.item;
                                 return (
@@ -117,8 +123,9 @@ const ChatScreen = () => {
                             }}
                         />
                     </View>
+                    {/* send */}
                     <View
-                        style={tw`flex-row w-full h-[8%] bg-[#FDFEFE] gap-x-4 px-3 items-center justify-center`}
+                        style={tw`flex-row w-full h-[8%] bg-[#FDFEFE] gap-x-4 px-3 pb-8 items-center justify-center`}
                     >
                         <View
                             style={tw`flex-row justify-between bg-[#DDE6ED] rounded-full`}
@@ -134,6 +141,7 @@ const ChatScreen = () => {
                             />
                             <TouchableOpacity
                                 onPress={() => {
+                                    Keyboard.dismiss();
                                     msg.length > 0 && sendMessage();
                                 }}
                                 style={tw`w-11 h-11 bg-green-600 rounded-lg items-center justify-center rounded-full `}

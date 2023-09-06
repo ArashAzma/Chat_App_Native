@@ -50,7 +50,9 @@ const ChatRoomCreation = () => {
             try {
                 console.log("TRY");
                 let imageURL = "";
-                if (image.length > 0) {
+                console.log("image");
+                console.log(image);
+                if (image && image.length > 0) {
                     imageURL = await uploadImageToDB(image);
                     console.log(imageURL);
                 }
@@ -66,10 +68,12 @@ const ChatRoomCreation = () => {
                 console.log("Created");
                 navigation.replace("Home");
             } catch (error) {
-                const desertRef = ref(fireStorage, "images/" + image);
-                // Delete the file
-                await deleteObject(desertRef);
-                console.log("DELETED");
+                if (image && image?.length > 0) {
+                    const desertRef = ref(fireStorage, "images/" + image);
+                    // Delete the file
+                    await deleteObject(desertRef);
+                    console.log("DELETED");
+                }
                 setError(error.message);
                 console.log("ERROR", error);
             } finally {
@@ -79,9 +83,7 @@ const ChatRoomCreation = () => {
     };
     return (
         <View style={tw`flex-1 items-center bg-[#FDFEFE] p-3`}>
-            <SafeAreaView
-                style={tw`h-full w-full items-center justify-center gap-y-10`}
-            >
+            <SafeAreaView style={tw`h-full w-full items-center justify-center`}>
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
                     style={tw`absolute top-12 left-5`}
@@ -91,8 +93,10 @@ const ChatRoomCreation = () => {
                 {loading ? (
                     <Loading />
                 ) : (
-                    <>
-                        <View style={tw`flex-row items-center justify-center`}>
+                    <View
+                        style={tw`bg-[#FDFEFE] shadow-lg w-full items-center justify-center h-[50%] gap-y-8`}
+                    >
+                        <View style={tw`flex-row items-center justify-center `}>
                             <Text style={tw`w-35 text-xl font-semibold`}>
                                 Please select an image for the Room
                             </Text>
@@ -115,7 +119,7 @@ const ChatRoomCreation = () => {
                             )}
                         </View>
                         <View
-                            style={tw`flex-row items-center justify-center w-80`}
+                            style={tw`flex-row items-center justify-center w-80 `}
                         >
                             <Text style={tw`w-25 text-xl font-semibold`}>
                                 Choose a name
@@ -124,7 +128,7 @@ const ChatRoomCreation = () => {
                                 value={name}
                                 useState={setName}
                                 placeholder='room name ...'
-                                addStyle='w-60 m-0'
+                                addStyle='w-60 m-0 '
                                 refrence={inputRef}
                             />
                         </View>
@@ -134,17 +138,19 @@ const ChatRoomCreation = () => {
                             <Text style={tw`w-38 text-lg text-red-600`}>
                                 {error}
                             </Text>
-                            <TouchableWithoutFeedback
-                                onPress={handleAddChatPress}
-                            >
-                                <Text
-                                    style={tw`font-semibold text-white text-2xl px-8 py-2 bg-green-500 rounded-xl`}
+                            <View style={tw`shadow-2xl rounded-lg`}>
+                                <TouchableWithoutFeedback
+                                    onPress={handleAddChatPress}
                                 >
-                                    Submit
-                                </Text>
-                            </TouchableWithoutFeedback>
+                                    <Text
+                                        style={tw`font-semibold text-white text-2xl px-8 py-2 bg-green-500 rounded-xl`}
+                                    >
+                                        Submit
+                                    </Text>
+                                </TouchableWithoutFeedback>
+                            </View>
                         </View>
-                    </>
+                    </View>
                 )}
             </SafeAreaView>
         </View>

@@ -19,12 +19,15 @@ import { doc, setDoc } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { deleteObject, ref } from "firebase/storage";
 import uploadImageToDB from "./../utils/UploadFile";
+import { Ionicons } from "@expo/vector-icons";
+
 const SignupScreen = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPass, setShowPass] = useState(false);
     const [image, setImage] = useState(null);
     const { width } = Dimensions.get("window");
     const navigation = useNavigation();
@@ -56,6 +59,8 @@ const SignupScreen = () => {
     const handleSignup = async () => {
         if (name.length < 3) {
             setError("Name is too short");
+        } else if (name.length > 12) {
+            setError("Name is too long");
         } else {
             if (email != "") {
                 if (!validateEmail(email)) {
@@ -71,11 +76,11 @@ const SignupScreen = () => {
                         pass
                     );
                     let imageURL = "";
-                    if (image.length > 0) {
+                    if (image && image?.length > 0) {
                         imageURL = await uploadImageToDB(image);
                         console.log(imageURL);
+                        console.log("IMAGE uploaded");
                     }
-                    console.log("IMAGE uploaded");
                     const data = {
                         _id: userCred?.user.uid,
                         name: name,
@@ -92,9 +97,14 @@ const SignupScreen = () => {
                     const user = fireAuth.currentUser;
                     if (user) {
                         await deleteUser(user);
-                        const desertRef = ref(fireStorage, "images/" + image);
-                        // Delete the file
-                        await deleteObject(desertRef);
+                        if (image && image.length > 0) {
+                            const desertRef = ref(
+                                fireStorage,
+                                "images/" + image
+                            );
+                            // Delete the file
+                            await deleteObject(desertRef);
+                        }
                         console.log("DELETED");
                     }
                     setError(error.message);
@@ -113,11 +123,9 @@ const SignupScreen = () => {
                 {loading ? (
                     <Loading />
                 ) : (
-                    <KeyboardAvoidingView
-                        style={tw`flex-1 items-center  w-full p-8 gap-4 mt-6`}
-                    >
+                    <>
                         <View
-                            style={tw`h-[15%] w-full items-start justify-end`}
+                            style={tw`h-[15%] w-full items-start justify-center`}
                         >
                             <Text style={tw`font-black text-4xl`}>Sign up</Text>
                         </View>
@@ -126,7 +134,7 @@ const SignupScreen = () => {
                                 <TouchableWithoutFeedback onPress={pickImage}>
                                     <Image
                                         source={{ uri: image }}
-                                        style={tw`rounded-full h-[45] w-[45] mr-4`}
+                                        style={tw`rounded-full h-[45] w-[45]`}
                                         resizeMode='contain'
                                     />
                                 </TouchableWithoutFeedback>
@@ -134,58 +142,91 @@ const SignupScreen = () => {
                                 <TouchableWithoutFeedback onPress={pickImage}>
                                     <Image
                                         source={require("../assets/icon.png")}
-                                        style={tw`rounded-full h-[45] w-[45] mr-4`}
+                                        style={tw`rounded-full h-[45] w-[45]`}
                                         resizeMode='contain'
                                     />
                                 </TouchableWithoutFeedback>
                             )}
                         </View>
-                        <View style={tw`flex-1 w-full gap-8 mt-4 items-center`}>
-                            <UserInput
-                                value={name}
-                                setState={setName}
-                                placeholder='name'
-                            />
-                            <UserInput
-                                value={email}
-                                setState={setEmail}
-                                placeholder='email'
-                            />
-                            <UserInput
-                                value={pass}
-                                setState={setPass}
-                                placeholder='password'
-                                isPass
-                            />
-                            {error && (
-                                <Text
-                                    style={tw`text-red-700 font-semibold w-full`}
-                                    numberOfLines={2}
-                                >
-                                    {error}
-                                </Text>
-                            )}
-                            <TouchableOpacity
-                                onPress={handleSignup}
-                                style={tw`bg-blue-600 px-3 py-2 w-full items-center rounded-lg shadow-xl shadow-blue-900`}
+                        <KeyboardAvoidingView
+                            style={tw`flex-1 items-center  w-full p-8 gap-4 `}
+                        >
+                            <View
+                                style={tw`flex-1 w-full gap-8 mt-4 items-center`}
                             >
-                                <Text style={tw`text-white text-lg`}>
-                                    Signup
-                                </Text>
-                            </TouchableOpacity>
-                            <View style={tw`flex-row items-center`}>
-                                <Text>Already have an account? </Text>
+                                <UserInput
+                                    value={name}
+                                    setState={setName}
+                                    placeholder='name'
+                                />
+                                <UserInput
+                                    value={email}
+                                    setState={setEmail}
+                                    placeholder='email'
+                                />
+                                <View style={tw`w-full`}>
+                                    <UserInput
+                                        value={pass}
+                                        setState={setPass}
+                                        placeholder='password'
+                                        isPass={!showPass}
+                                    />
+                                    {showPass ? (
+                                        <TouchableWithoutFeedback
+                                            onPress={() => setShowPass(false)}
+                                        >
+                                            <Ionicons
+                                                name='ios-eye-outline'
+                                                size={24}
+                                                color='black'
+                                                style={tw`absolute top-4 right-0`}
+                                            />
+                                        </TouchableWithoutFeedback>
+                                    ) : (
+                                        <TouchableWithoutFeedback
+                                            onPress={() => setShowPass(true)}
+                                        >
+                                            <Ionicons
+                                                name='ios-eye-off-outline'
+                                                size={24}
+                                                color='black'
+                                                style={tw`absolute top-4 right-0`}
+                                            />
+                                        </TouchableWithoutFeedback>
+                                    )}
+                                </View>
+                                {error && (
+                                    <Text
+                                        style={tw`text-red-700 font-semibold w-full`}
+                                        numberOfLines={2}
+                                    >
+                                        {error}
+                                    </Text>
+                                )}
                                 <TouchableOpacity
-                                    onPress={handleLogin}
-                                    style={tw`px-3 py-2`}
+                                    onPress={handleSignup}
+                                    style={tw`bg-blue-600 px-3 py-2 w-full items-center rounded-lg shadow-xl shadow-blue-900`}
                                 >
-                                    <Text style={tw`text-blue-800 font-bold`}>
-                                        login
+                                    <Text style={tw`text-white text-lg`}>
+                                        Signup
                                     </Text>
                                 </TouchableOpacity>
+                                <View style={tw`flex-row items-center`}>
+                                    <Text>Already have an account? </Text>
+                                    <TouchableOpacity
+                                        onPress={handleLogin}
+                                        style={tw`px-3 py-2`}
+                                    >
+                                        <Text
+                                            style={tw`text-blue-800 font-bold`}
+                                        >
+                                            login
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
-                    </KeyboardAvoidingView>
+                        </KeyboardAvoidingView>
+                    </>
                 )}
             </SafeAreaView>
         </View>

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useContext, useLayoutEffect, useRef, useState } from "react";
 import { userContext } from "../context/UserProvider";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import tw from "twrnc";
 import InputText from "../components/InputText";
 import { fireAuth, fireDb } from "../config/firebase.config";
@@ -27,11 +27,14 @@ import {
 import Loading from "./../components/Loading";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRoomCard from "../components/ChatRoomCard";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 
 const AccountScreen = () => {
     const { user, setUser, removeCurrentUser } = useContext(userContext);
+    const route = useRoute();
+    const { USER } = route?.params;
+    const itsUsersAcc = USER._id == user._id;
     const [change, setChange] = useState("");
     const [error, setError] = useState("");
     const [chatRooms, setChatRooms] = useState();
@@ -73,7 +76,6 @@ const AccountScreen = () => {
             setLoading(false);
         }
     };
-
     const handleNameEdit = () => {
         inputRef.current.focus();
     };
@@ -106,10 +108,9 @@ const AccountScreen = () => {
     };
     useLayoutEffect(() => {
         try {
-            console.log(user?._id);
             const chatQuery = query(
                 collection(fireDb, "Chats"),
-                where("user._id", "==", user._id),
+                where("user._id", "==", itsUsersAcc ? user._id : USER._id),
                 orderBy("_id", "desc")
             );
             const unsubscribe = onSnapshot(chatQuery, (queryShot) => {
@@ -140,68 +141,102 @@ const AccountScreen = () => {
                         style={tw`flex-1 w-full mt-6 items-center bg-[#FDFEFE]`}
                     >
                         <TouchableOpacity
-                            style={tw`bg-red-600 absolute right-5 top-6 w-15 h-10 items-center justify-center rounded-lg bg-opacity-95`}
-                            onPress={handleLogout}
+                            onPress={() => navigation.goBack()}
+                            style={tw`absolute top-8 left-8`}
                         >
-                            <Text style={tw`text-white`}>Logout</Text>
+                            <FontAwesome
+                                name='arrow-left'
+                                size={24}
+                                color='black'
+                            />
                         </TouchableOpacity>
-                        <TouchableWithoutFeedback onPress={handleImageEdit}>
+                        {itsUsersAcc && (
+                            <TouchableOpacity
+                                style={tw`bg-red-600 absolute right-5 top-6 w-15 h-10 items-center justify-center rounded-lg bg-opacity-95`}
+                                onPress={handleLogout}
+                            >
+                                <Text style={tw`text-white`}>Logout</Text>
+                            </TouchableOpacity>
+                        )}
+                        <TouchableWithoutFeedback
+                            onPress={handleImageEdit}
+                            disabled={!itsUsersAcc}
+                        >
                             <View>
                                 <Image
                                     source={
-                                        user.photoURL
-                                            ? { uri: user.photoURL }
+                                        (
+                                            itsUsersAcc
+                                                ? user?.photoURL.length > 0
+                                                : USER?.photoURL.length > 0
+                                        )
+                                            ? {
+                                                  uri: itsUsersAcc
+                                                      ? user.photoURL
+                                                      : USER.photoURL,
+                                              }
                                             : require("../assets/icon.png")
                                     }
-                                    style={tw`rounded-full h-[40] w-[40] mr-4 `}
+                                    style={tw`rounded-full h-[40] w-[40]  `}
                                     resizeMode='contain'
                                 />
-                                <Feather
-                                    name='edit'
-                                    size={28}
-                                    color='blue'
-                                    style={tw`absolute bottom-1 right-3`}
-                                />
+                                {itsUsersAcc && (
+                                    <Feather
+                                        name='edit'
+                                        size={28}
+                                        color='blue'
+                                        style={tw`absolute bottom-1 -right-2`}
+                                    />
+                                )}
                             </View>
                         </TouchableWithoutFeedback>
                         <View style={tw`w-full items-center justify-center`}>
-                            <Text style={tw`text-3xl font-semibold my-8`}>
-                                {user.name}
+                            <Text
+                                style={tw`text-3xl font-semibold my-8 `}
+                                numberOfLines={1}
+                            >
+                                {itsUsersAcc ? user.name : USER.name}
                                 <TouchableOpacity
                                     style={tw`absolute -right-3 `}
                                     onPress={handleNameEdit}
+                                    disabled={!itsUsersAcc}
                                 >
-                                    <Feather
-                                        name='edit'
-                                        size={18}
-                                        color='blue'
-                                    />
+                                    {itsUsersAcc && (
+                                        <Feather
+                                            name='edit'
+                                            size={18}
+                                            color='blue'
+                                        />
+                                    )}
                                 </TouchableOpacity>
                             </Text>
                         </View>
-                        <View style={tw`w-full`}>
-                            <Text style={tw`text-xl px-6 font-semibold`}>
-                                Enter your new Name :
-                            </Text>
-                            <InputText
-                                refrence={inputRef}
-                                value={change}
-                                useState={setChange}
-                                placeholder='Enter your new name'
-                                handleSubmit={handleSubmit}
-                            />
-                            {error && (
-                                <Text
-                                    style={tw`text-red-700 font-semibold w-full px-6 text-4`}
-                                    numberOfLines={2}
-                                >
-                                    {error}
+                        {itsUsersAcc && (
+                            <View style={tw`w-full`}>
+                                <Text style={tw`text-xl px-6 font-semibold`}>
+                                    Enter your new Name :
                                 </Text>
-                            )}
-                        </View>
+                                <InputText
+                                    refrence={inputRef}
+                                    value={change}
+                                    useState={setChange}
+                                    placeholder='Enter your new name'
+                                    handleSubmit={handleSubmit}
+                                />
+                                {error && (
+                                    <Text
+                                        style={tw`text-red-700 font-semibold w-full px-6 text-4`}
+                                        numberOfLines={2}
+                                    >
+                                        {error}
+                                    </Text>
+                                )}
+                            </View>
+                        )}
                         <View style={tw`flex-1 w-full`}>
                             <Text style={tw`text-xl px-6 font-semibold`}>
-                                Your chat rooms :
+                                {`${itsUsersAcc ? "Your" : USER.name}`} chat
+                                rooms :
                             </Text>
                             <ScrollView
                                 contentContainerStyle={tw`p-4`}
@@ -218,12 +253,32 @@ const AccountScreen = () => {
                                     </>
                                 ) : (
                                     <View
-                                        style={tw` w-full items-center justify-center `}
+                                        style={tw`flex-row items-center w-full items-center  p-22`}
                                     >
-                                        <Text style={tw`p-22 text-xl`}>
-                                            You Currntly Don't have any chat
-                                            rooms
+                                        <Text style={tw`text-xl w-[75%]`}>
+                                            {`${
+                                                itsUsersAcc ? "You " : USER.name
+                                            }`}
+                                            currently don't have any chat rooms
                                         </Text>
+                                        {itsUsersAcc && (
+                                            <View style={tw`w-[25%]`}>
+                                                <TouchableOpacity
+                                                    onPress={() =>
+                                                        navigation.navigate(
+                                                            "ChatCreation"
+                                                        )
+                                                    }
+                                                    style={tw`bg-green-600 p-2 rounded-lg h-20 w-20 rounded-full items-center justify-center shadow-lg shadow-green-900 `}
+                                                >
+                                                    <Text
+                                                        style={tw`text-white text-4xl`}
+                                                    >
+                                                        +
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
                                     </View>
                                 )}
                             </ScrollView>
