@@ -20,9 +20,11 @@ const Footer = () => {
     return (
         <View
             style={tw`${
-                routeName == "Login" || routeName == "Signup"
-                    ? "invisible "
-                    : "visible "
+                routeName == "Login" ||
+                routeName == "Signup" ||
+                routeName === "ChatCreation"
+                    ? "hidden "
+                    : " visible "
             } h-20 w-full flex-row justify-evenly items-center`}
         >
             <TouchableWithoutFeedback

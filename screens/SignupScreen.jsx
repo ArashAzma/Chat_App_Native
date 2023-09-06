@@ -1,9 +1,7 @@
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
-    ActivityIndicator,
     Image,
     Dimensions,
     TouchableWithoutFeedback,
@@ -96,13 +94,7 @@ const SignupScreen = () => {
                         await deleteUser(user);
                         const desertRef = ref(fireStorage, "images/" + image);
                         // Delete the file
-                        deleteObject(desertRef)
-                            .then(() => {
-                                // File deleted successfully
-                            })
-                            .catch((error) => {
-                                // Uh-oh, an error occurred!
-                            });
+                        await deleteObject(desertRef);
                         console.log("DELETED");
                     }
                     setError(error.message);

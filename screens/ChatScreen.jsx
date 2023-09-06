@@ -10,7 +10,6 @@ import {
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
 import MessageCard from "../components/MessageCard";
 import { userContext } from "../context/UserProvider";
 import { FontAwesome } from "@expo/vector-icons";
@@ -25,7 +24,6 @@ import {
 } from "firebase/firestore";
 import { fireDb } from "../config/firebase.config";
 import tw from "twrnc";
-
 const ChatScreen = () => {
     const route = useRoute();
     const { room } = route.params;
@@ -34,7 +32,6 @@ const ChatScreen = () => {
     const navigation = useNavigation();
     const [messages, setMessages] = useState();
     const [msg, setMsg] = useState("");
-    c;
 
     const sendMessage = async () => {
         const timeStamp = serverTimestamp();

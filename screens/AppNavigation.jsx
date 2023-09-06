@@ -8,6 +8,7 @@ import SplashScreen from "./SplashScreen";
 import ChatScreen from "./ChatScreen";
 import AccountScreen from "./AccountScreen";
 import Footer from "../components/footer";
+import ChatRoomCreation from "./ChatRoomCreation";
 const Stack = createNativeStackNavigator();
 
 const AppNavigation = () => {
@@ -24,6 +25,10 @@ const AppNavigation = () => {
                 <Stack.Screen name='Home' component={HomeScreen} />
                 <Stack.Screen name='Chat' component={ChatScreen} />
                 <Stack.Screen name='Account' component={AccountScreen} />
+                <Stack.Screen
+                    name='ChatCreation'
+                    component={ChatRoomCreation}
+                />
             </Stack.Navigator>
             <Footer />
         </NavigationContainer>
