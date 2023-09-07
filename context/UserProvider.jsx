@@ -6,6 +6,8 @@ export const userContext = createContext();
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
     const [userProfileURL, setUserProfileURL] = useState();
+    const [itsUsersAcc, setItsUsersAcc] = useState(true);
+
     const setCurrentUser = async (USER) => {
         try {
             await AsyncStorage.setItem("@userId", JSON.stringify(USER._id));

@@ -45,6 +45,8 @@ const ChatRoomCreation = () => {
     const handleAddChatPress = async () => {
         if (name.length < 3) {
             setError("Name is too short");
+        } else if (name.length > 12) {
+            setError("Name is too long");
         } else {
             setLoading(true);
             try {

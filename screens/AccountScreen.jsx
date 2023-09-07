@@ -2,13 +2,19 @@ import {
     View,
     Text,
     Image,
-    Dimensions,
     TouchableOpacity,
-    FlatList,
     ScrollView,
     TouchableWithoutFeedback,
+    RefreshControl,
 } from "react-native";
-import React, { useContext, useLayoutEffect, useRef, useState } from "react";
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import { userContext } from "../context/UserProvider";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import tw from "twrnc";
@@ -29,18 +35,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRoomCard from "../components/ChatRoomCard";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
+import Footer from "../components/footer";
 
-const AccountScreen = () => {
-    const { user, setUser, removeCurrentUser } = useContext(userContext);
+const AccountScreen = ({ navigation }) => {
     const route = useRoute();
-    const { USER } = route?.params;
-    const itsUsersAcc = USER._id == user._id;
+    const { user, setUser, removeCurrentUser } = useContext(userContext);
+    const { accountUser } = route?.params;
     const [change, setChange] = useState("");
+    const [itsUsersAcc, setItsUsersAcc] = useState(false);
     const [error, setError] = useState("");
-    const [chatRooms, setChatRooms] = useState();
+    const [chatRooms, setChatRooms] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const inputRef = useRef();
-    const navigation = useNavigation();
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        console.log(itsUsersAcc);
+        getData();
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
     const handleImageEdit = async () => {
         try {
             setLoading(true);
@@ -106,21 +122,44 @@ const AccountScreen = () => {
             setLoading(false);
         }
     };
-    useLayoutEffect(() => {
+    const getData = () => {
+        setItsUsersAcc(accountUser._id == user._id);
+        let unsubscribe;
         try {
+            console.log("TRY");
             const chatQuery = query(
                 collection(fireDb, "Chats"),
-                where("user._id", "==", itsUsersAcc ? user._id : USER._id),
+                where(
+                    "user._id",
+                    "==",
+                    itsUsersAcc ? user._id : accountUser._id
+                ),
                 orderBy("_id", "desc")
             );
-            const unsubscribe = onSnapshot(chatQuery, (queryShot) => {
+            unsubscribe = onSnapshot(chatQuery, (queryShot) => {
                 const rooms = queryShot.docs.map((doc) => doc.data());
                 setChatRooms(rooms);
             });
         } catch (error) {
             console.log(error);
         }
-    }, []);
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+    };
+
+    useLayoutEffect(() => {
+        console.log(user?.name);
+        console.log(accountUser?.name);
+        setItsUsersAcc(accountUser?._id == user?._id);
+        const cleanup = getData();
+        return () => {
+            cleanup();
+        };
+    }, [itsUsersAcc, loading]);
+
     const handleLogout = async () => {
         try {
             await fireAuth.signOut();
@@ -168,12 +207,13 @@ const AccountScreen = () => {
                                         (
                                             itsUsersAcc
                                                 ? user?.photoURL.length > 0
-                                                : USER?.photoURL.length > 0
+                                                : accountUser?.photoURL.length >
+                                                  0
                                         )
                                             ? {
                                                   uri: itsUsersAcc
                                                       ? user.photoURL
-                                                      : USER.photoURL,
+                                                      : accountUser.photoURL,
                                               }
                                             : require("../assets/icon.png")
                                     }
@@ -195,7 +235,7 @@ const AccountScreen = () => {
                                 style={tw`text-3xl font-semibold my-8 `}
                                 numberOfLines={1}
                             >
-                                {itsUsersAcc ? user.name : USER.name}
+                                {itsUsersAcc ? user.name : accountUser.name}
                                 <TouchableOpacity
                                     style={tw`absolute -right-3 `}
                                     onPress={handleNameEdit}
@@ -235,12 +275,18 @@ const AccountScreen = () => {
                         )}
                         <View style={tw`flex-1 w-full`}>
                             <Text style={tw`text-xl px-6 font-semibold`}>
-                                {`${itsUsersAcc ? "Your" : USER.name}`} chat
-                                rooms :
+                                {`${itsUsersAcc ? "Your" : accountUser.name}`}{" "}
+                                chat rooms :
                             </Text>
                             <ScrollView
                                 contentContainerStyle={tw`p-4`}
                                 showsVerticalScrollIndicator={false}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={onRefresh}
+                                    />
+                                }
                             >
                                 {chatRooms && chatRooms.length > 0 ? (
                                     <>
@@ -248,6 +294,8 @@ const AccountScreen = () => {
                                             <ChatRoomCard
                                                 room={room}
                                                 key={room._id}
+                                                itsUsersAcc={itsUsersAcc}
+                                                setLoading={setLoading}
                                             />
                                         ))}
                                     </>
@@ -257,7 +305,9 @@ const AccountScreen = () => {
                                     >
                                         <Text style={tw`text-xl w-[75%]`}>
                                             {`${
-                                                itsUsersAcc ? "You " : USER.name
+                                                itsUsersAcc
+                                                    ? "You "
+                                                    : accountUser.name
                                             }`}
                                             currently don't have any chat rooms
                                         </Text>
@@ -286,6 +336,7 @@ const AccountScreen = () => {
                     </SafeAreaView>
                 </View>
             )}
+            <Footer nav={navigation} />
         </>
     );
 };

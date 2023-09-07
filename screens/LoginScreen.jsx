@@ -69,16 +69,16 @@ const LoginScreen = () => {
         <>
             <View style={tw`flex-1 w-full bg-[#FDFEFE] `}>
                 <SafeAreaView
-                    style={tw`flex-1 items-center  w-full p-8 gap-4 mt-6`}
+                    style={tw`flex-1 items-center w-full p-8 gap-4 mt-6 `}
                 >
                     {loading ? (
                         <Loading />
                     ) : (
                         <KeyboardAvoidingView
-                            style={tw`flex-1 items-center  w-full p-8 gap-4 mt-6`}
+                            style={tw`flex-1 items-center w-full px-8 gap-4`}
                         >
                             <View
-                                style={tw`h-[45%] w-full items-start justify-end`}
+                                style={tw`h-[35%] w-full items-start justify-end`}
                             >
                                 <Text style={tw`font-black text-4xl`}>
                                     Login

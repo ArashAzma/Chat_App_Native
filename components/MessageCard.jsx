@@ -20,7 +20,7 @@ const MessageCard = ({ message, isUser }) => {
                     <TouchableWithoutFeedback
                         onPress={() =>
                             navigation.navigate("Account", {
-                                USER: message.user,
+                                accountUser: message.user,
                             })
                         }
                     >

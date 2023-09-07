@@ -1,39 +1,33 @@
 import { View, TouchableWithoutFeedback } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import tw from "twrnc";
 import { Feather } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
+import { useNavigationState } from "@react-navigation/native";
 import { userContext } from "../context/UserProvider";
-const Footer = () => {
+
+const Footer = ({ nav }) => {
     const { user } = useContext(userContext);
-    const navigation = useNavigation();
+    const [home, setHome] = useState(true);
+    const [account, setAccount] = useState(false);
     const routeName = useNavigationState((state) => {
         const arr = state?.routes;
         return arr?.[arr?.length - 1]?.name;
     });
-    const [home, setHome] = useState(true);
-    const [account, setAccount] = useState(false);
-    const handleTab = (name) => {
-        setHome(name == "home");
-        setAccount(name == "account");
-    };
+    useEffect(() => {
+        console.log(routeName);
+        setHome(routeName == "Home");
+        setAccount(routeName == "Account");
+    }, [routeName]);
     return (
         <View
-            style={tw`${
-                routeName == "Login" ||
-                routeName == "Signup" ||
-                routeName === "ChatCreation" ||
-                routeName === "Chat"
-                    ? "hidden "
-                    : ""
-            } h-20 w-full flex-row justify-evenly items-center`}
+            style={tw`h-20 w-full flex-row justify-evenly items-center bg-[#FDFEFE]`}
         >
+            {/* home */}
             <TouchableWithoutFeedback
                 onPress={() => {
-                    navigation.navigate("Home");
-                    handleTab("home");
+                    nav.navigate("Home");
                 }}
             >
                 <View style={tw`flex items-center`}>
@@ -53,10 +47,10 @@ const Footer = () => {
                     )}
                 </View>
             </TouchableWithoutFeedback>
+            {/* account */}
             <TouchableWithoutFeedback
                 onPress={() => {
-                    navigation.navigate("Account", { USER: user });
-                    handleTab("account");
+                    nav.push("Account", { accountUser: user });
                 }}
             >
                 <View style={tw`flex items-center`}>

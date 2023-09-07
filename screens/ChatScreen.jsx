@@ -26,6 +26,7 @@ import {
 } from "firebase/firestore";
 import { fireDb } from "../config/firebase.config";
 import tw from "twrnc";
+import Loading from "../components/Loading";
 const ChatScreen = () => {
     const route = useRoute();
     const { room } = route.params;
@@ -34,6 +35,7 @@ const ChatScreen = () => {
     const navigation = useNavigation();
     const [messages, setMessages] = useState();
     const [msg, setMsg] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const sendMessage = async () => {
         const timeStamp = serverTimestamp();
@@ -56,16 +58,16 @@ const ChatScreen = () => {
         }
     };
     useLayoutEffect(() => {
+        setLoading(true);
         const msgQuery = query(
             collection(fireDb, "Chats", room?._id, "messages"),
             orderBy("timeStamp", "asc")
         );
         const unsubscribe = onSnapshot(msgQuery, (querySnap) => {
             const upMsg = querySnap.docs.map((doc) => doc.data());
-            // console.log("upMsg");
-            // console.log(upMsg);
             setMessages(upMsg);
         });
+        setLoading(false);
         return unsubscribe;
     }, []);
     return (
@@ -100,28 +102,34 @@ const ChatScreen = () => {
                     <View
                         style={tw`w-full h-[77%] py-12 bg-[#FDFEFE] px-3 rounded-t-15`}
                     >
-                        <KeyboardAwareFlatList
-                            inverted
-                            data={messages && [...messages].reverse()}
-                            showsVerticalScrollIndicator={false}
-                            ref={(ref) => (this.flatList = ref)}
-                            // onContentSizeChange={() =>
-                            //     this.flatList.scrollToEnd({ animated: true })
-                            // }
-                            // onLayout={() =>
-                            //     this.flatList.scrollToEnd({ animated: true })
-                            // }
-                            renderItem={(item) => {
-                                const msg = item.item;
-                                return (
-                                    <MessageCard
-                                        message={msg}
-                                        key={msg._id}
-                                        isUser={msg.user.email == user.email}
-                                    />
-                                );
-                            }}
-                        />
+                        {loading ? (
+                            <Loading />
+                        ) : (
+                            <KeyboardAwareFlatList
+                                inverted
+                                data={messages && [...messages].reverse()}
+                                showsVerticalScrollIndicator={false}
+                                ref={(ref) => (this.flatList = ref)}
+                                // onContentSizeChange={() =>
+                                //     this.flatList.scrollToEnd({ animated: true })
+                                // }
+                                // onLayout={() =>
+                                //     this.flatList.scrollToEnd({ animated: true })
+                                // }
+                                renderItem={(item) => {
+                                    const msg = item.item;
+                                    return (
+                                        <MessageCard
+                                            message={msg}
+                                            key={msg._id}
+                                            isUser={
+                                                msg.user.email == user.email
+                                            }
+                                        />
+                                    );
+                                }}
+                            />
+                        )}
                     </View>
                     {/* send */}
                     <View

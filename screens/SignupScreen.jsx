@@ -19,7 +19,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { deleteObject, ref } from "firebase/storage";
 import uploadImageToDB from "./../utils/UploadFile";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 
 const SignupScreen = () => {
     const [name, setName] = useState("");
@@ -116,44 +116,56 @@ const SignupScreen = () => {
         }
     };
     return (
-        <View style={tw`flex-1   w-full  bg-[#FDFEFE]`}>
+        <View style={tw`flex-1 w-full bg-[#FDFEFE]`}>
             <SafeAreaView
-                style={tw`flex-1 items-center  w-full p-8 gap-4 mt-6`}
+                style={tw`flex-1 items-center w-full p-8 gap-4 mt-6 justify-center`}
             >
                 {loading ? (
                     <Loading />
                 ) : (
                     <>
                         <View
-                            style={tw`h-[15%] w-full items-start justify-center`}
+                            style={tw`flex-row w-full justify-evenly items-center`}
                         >
                             <Text style={tw`font-black text-4xl`}>Sign up</Text>
-                        </View>
-                        <View>
                             {image ? (
                                 <TouchableWithoutFeedback onPress={pickImage}>
-                                    <Image
-                                        source={{ uri: image }}
-                                        style={tw`rounded-full h-[45] w-[45]`}
-                                        resizeMode='contain'
-                                    />
+                                    <>
+                                        <Image
+                                            source={{ uri: image }}
+                                            style={tw`rounded-full h-[30] w-[30]`}
+                                            resizeMode='contain'
+                                        />
+                                        <Feather
+                                            name='edit'
+                                            size={22}
+                                            color='blue'
+                                            style={tw`absolute bottom-2 right-4`}
+                                        />
+                                    </>
                                 </TouchableWithoutFeedback>
                             ) : (
                                 <TouchableWithoutFeedback onPress={pickImage}>
-                                    <Image
-                                        source={require("../assets/icon.png")}
-                                        style={tw`rounded-full h-[45] w-[45]`}
-                                        resizeMode='contain'
-                                    />
+                                    <>
+                                        <Image
+                                            source={require("../assets/icon.png")}
+                                            style={tw`rounded-full h-[30] w-[30]`}
+                                            resizeMode='contain'
+                                        />
+                                        <Feather
+                                            name='edit'
+                                            size={22}
+                                            color='blue'
+                                            style={tw`absolute bottom-2 right-4`}
+                                        />
+                                    </>
                                 </TouchableWithoutFeedback>
                             )}
                         </View>
                         <KeyboardAvoidingView
-                            style={tw`flex-1 items-center  w-full p-8 gap-4 `}
+                            style={tw` items-center w-full px-8 gap-2`}
                         >
-                            <View
-                                style={tw`flex-1 w-full gap-8 mt-4 items-center`}
-                            >
+                            <View style={tw` w-full gap-8 mt-4 items-center`}>
                                 <UserInput
                                     value={name}
                                     setState={setName}
