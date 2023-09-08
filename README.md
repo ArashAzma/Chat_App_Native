@@ -1,17 +1,18 @@
-# Massenger application
-a realtime chat application using email and password authentication and firebase firestore and storage that you can create chatrooms and set profile image and chat with all the peaple and see their profile account
+# Messenger Application
+### "Use a European VPN server, or it won't work"
+A real-time chat application that offers email and password authentication, powered by Firebase Firestore and Storage. With this app, you can create chatrooms, set profile images, and chat with all the people while viewing their profile accounts.
 
 
 ## Technologies Used
 
 - React Native
 - Expo
-- FireBase auth
+- Firebase Auth
 - Firestore
-- Firebase storage
+- Firebase Storage
 - REST API
 - AsyncStorage
-- React navigation
+- React Navigation
 
 ## Installation
 
