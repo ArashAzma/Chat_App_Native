@@ -1,6 +1,5 @@
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { fireStorage } from "../config/firebase.config";
-import { useContext } from "react";
 export default uploadImageToDB = async (image) => {
     const response = await fetch(image);
     const blob = await response.blob();

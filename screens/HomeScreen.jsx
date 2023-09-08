@@ -23,7 +23,6 @@ const HomeScreen = ({ navigation }) => {
             console.log(error);
         }
     }, []);
-
     return (
         <>
             <View style={tw`flex-1 items-center bg-[#FDFEFE] p-3`}>

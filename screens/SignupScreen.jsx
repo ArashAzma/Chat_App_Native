@@ -29,7 +29,6 @@ const SignupScreen = () => {
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
     const [image, setImage] = useState(null);
-    const { width } = Dimensions.get("window");
     const navigation = useNavigation();
 
     const pickImage = async () => {
@@ -125,12 +124,13 @@ const SignupScreen = () => {
                 ) : (
                     <>
                         <View
-                            style={tw`flex-row w-full justify-evenly items-center`}
+                            style={tw`flex-row w-full justify-evenly items-center `}
                         >
                             <Text style={tw`font-black text-4xl`}>Sign up</Text>
+
                             {image ? (
                                 <TouchableWithoutFeedback onPress={pickImage}>
-                                    <>
+                                    <View>
                                         <Image
                                             source={{ uri: image }}
                                             style={tw`rounded-full h-[30] w-[30]`}
@@ -140,13 +140,13 @@ const SignupScreen = () => {
                                             name='edit'
                                             size={22}
                                             color='blue'
-                                            style={tw`absolute bottom-2 right-4`}
+                                            style={tw`absolute bottom-2 -right-2`}
                                         />
-                                    </>
+                                    </View>
                                 </TouchableWithoutFeedback>
                             ) : (
                                 <TouchableWithoutFeedback onPress={pickImage}>
-                                    <>
+                                    <View>
                                         <Image
                                             source={require("../assets/icon.png")}
                                             style={tw`rounded-full h-[30] w-[30]`}
@@ -156,9 +156,9 @@ const SignupScreen = () => {
                                             name='edit'
                                             size={22}
                                             color='blue'
-                                            style={tw`absolute bottom-2 right-4`}
+                                            style={tw`absolute bottom-2 -right-2`}
                                         />
-                                    </>
+                                    </View>
                                 </TouchableWithoutFeedback>
                             )}
                         </View>

@@ -16,7 +16,6 @@ const Footer = ({ nav }) => {
         return arr?.[arr?.length - 1]?.name;
     });
     useEffect(() => {
-        console.log(routeName);
         setHome(routeName == "Home");
         setAccount(routeName == "Account");
     }, [routeName]);
